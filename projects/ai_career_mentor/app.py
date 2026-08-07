@@ -1,8 +1,8 @@
 from chains.career_chain import career_chain
 
-print("=" * 60)
+print("=" * 65)
 print("🤖 AI Career Mentor")
-print("=" * 60)
+print("=" * 65)
 
 name = input("Your Name: ")
 skills = input("Your Skills (comma separated): ")
