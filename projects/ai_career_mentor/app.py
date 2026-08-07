@@ -20,9 +20,9 @@ result = career_chain.invoke(
     }
 )
 
-print("=" * 60)
+print("=" * 65)
 print("CAREER ANALYSIS")
-print("=" * 60)
+print("=" * 65)
 
 print(f"\nCurrent Level : {result.current_level}")
 
@@ -47,4 +47,4 @@ for item in result.learning_priority:
 print("\nCareer Summary")
 print(result.career_summary)
 
-print("=" * 60)
+print("=" * 65)
