@@ -1,4 +1,5 @@
 from chains.career_chain import career_chain
+from chains.roadmap_chain import roadmap_chain
 
 print("=" * 65)
 print("🤖 AI Career Mentor")
@@ -19,6 +20,12 @@ result = career_chain.invoke(
         "target_role": target_role,
     }
 )
+
+roadmap_input = {
+    "career_analysis": result.model_dump_json(indent=2)
+}
+
+roadmap_result = roadmap_chain.invoke(roadmap_input)
 
 print("=" * 65)
 print("CAREER ANALYSIS")
@@ -48,3 +55,31 @@ print("\nCareer Summary")
 print(result.career_summary)
 
 print("=" * 65)
+
+print("\n" + "=" * 65)
+print("PERSONALIZED CAREER ROADMAP")
+print("=" * 65)
+
+print(f"\n🎯 Target Role")
+print(roadmap_result.target_role)
+
+print(f"\n⏱️ Recommended Duration")
+print(roadmap_result.roadmap_duration)
+
+print(f"\n📚 Learning Phases")
+for index, phase in enumerate(roadmap_result.phases, start=1):
+    print(f"{index}. {phase}")
+
+print(f"\n🧠 Skills to Learn")
+for skill in roadmap_result.skills_to_learn:
+    print(f"• {skill}")
+
+print(f"\n🛠️ Projects to Build")
+for project in roadmap_result.projects_to_build:
+    print(f"• {project}")
+
+print(f"\n💡 Final Advice")
+print(roadmap_result.final_advice)
+
+print("\n" + "=" * 65)
+
