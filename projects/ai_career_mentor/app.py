@@ -2,165 +2,123 @@ from chains.career_chain import career_chain
 from chains.roadmap_chain import roadmap_chain
 from chains.project_chain import project_chain
 from chains.interview_chain import interview_chain
+from utils.display import (
+    display_career_analysis,
+    display_roadmap,
+    display_projects,
+    display_interview_preparation,
+)
 
 
-print("=" * 65)
-print("🤖 AI Career Mentor")
-print("=" * 65)
+# ============================================================
+# USER INPUT
+# ============================================================
 
-name = input("Your Name: ")
-skills = input("Your Skills (comma separated): ")
-experience = input("Your Experience: ")
-target_role = input("Target Role: ")
+def get_user_profile():
+    print("=" * 65)
+    print("🤖 AI Career Mentor")
+    print("=" * 65)
 
-print("\nAnalyzing profile...\n")
+    name = input("Your Name: ")
+    skills = input("Your Skills (comma separated): ")
+    experience = input("Your Experience: ")
+    target_role = input("Target Role: ")
 
-career_result = career_chain.invoke(
-    {
+    return {
         "name": name,
         "skills": skills,
         "experience": experience,
         "target_role": target_role,
     }
-)
 
-roadmap_input = {
-    "career_analysis": career_result.model_dump_json(indent=2)
-}
 
-roadmap_result = roadmap_chain.invoke(roadmap_input)
+# ============================================================
+# CAREER ANALYSIS
+# ============================================================
 
-project_input = {
-    "career_analysis": career_result.model_dump_json(indent=2),
-    "roadmap": roadmap_result.model_dump_json(indent=2)
-}
+def run_career_analysis(profile):
+    return career_chain.invoke(profile)
 
-project_result = project_chain.invoke(project_input)
 
-interview_input = {
-        "career_analysis": career_result.model_dump_json(indent=2),
-        "roadmap": roadmap_result.model_dump_json(indent=2),
-        "projects": project_result.model_dump_json(indent=2)
+# ============================================================
+# ROADMAP
+# ============================================================
+
+def run_roadmap(career_result):
+    roadmap_input = {
+        "career_analysis": career_result.model_dump_json(indent=2)
     }
 
-interview_result = interview_chain.invoke(interview_input)
+    return roadmap_chain.invoke(roadmap_input)
 
 
-print("=" * 65)
-print("CAREER ANALYSIS")
-print("=" * 65)
+# ============================================================
+# PROJECT RECOMMENDATIONS
+# ============================================================
+
+def run_project_recommendations(career_result, roadmap_result):
+    project_input = {
+        "career_analysis": career_result.model_dump_json(indent=2),
+        "roadmap": roadmap_result.model_dump_json(indent=2),
+    }
+
+    return project_chain.invoke(project_input)
 
 
+# ============================================================
+# INTERVIEW PREPARATION
+# ============================================================
 
-print(f"\nCurrent Level : {career_result.current_level}")
+def run_interview_preparation(
+    career_result,
+    roadmap_result,
+    project_result,
+):
+    interview_input = {
+        "career_analysis": career_result.model_dump_json(indent=2),
+        "roadmap": roadmap_result.model_dump_json(indent=2),
+        "projects": project_result.model_dump_json(indent=2),
+    }
 
-print(f"\nJob Match Score : {career_result.match_score}/100")
+    return interview_chain.invoke(interview_input)
 
-print("\nStrengths")
-for item in career_result.strengths:
-    print(f"• {item}")
 
-print("\nWeaknesses")
-for item in career_result.weaknesses:
-    print(f"• {item}")
+# ============================================================
+# MAIN APPLICATION FLOW
+# ============================================================
 
-print("\nMissing Skills")
-for item in career_result.missing_skills:
-    print(f"• {item}")
+def main():
+    profile = get_user_profile()
 
-print("\nLearning Priority")
-for item in career_result.learning_priority:
-    print(f"• {item}")
+    print("\nAnalyzing profile...\n")
 
-print("\nCareer Summary")
-print(career_result.career_summary)
+    # 1. Career Analysis
+    career_result = run_career_analysis(profile)
+    display_career_analysis(career_result)
 
-print("=" * 65)
+    # 2. Roadmap
+    roadmap_result = run_roadmap(career_result)
+    display_roadmap(roadmap_result)
 
-print("\n" + "=" * 65)
-print("PERSONALIZED CAREER ROADMAP")
-print("=" * 65)
+    # 3. Project Recommendations
+    project_result = run_project_recommendations(
+        career_result,
+        roadmap_result,
+    )
+    display_projects(project_result)
 
-print(f"\n🎯 Target Role")
-print(roadmap_result.target_role)
-
-print(f"\n⏱️ Recommended Duration")
-print(roadmap_result.roadmap_duration)
-
-print(f"\n📚 Learning Phases")
-for index, phase in enumerate(roadmap_result.phases, start=1):
-    print(f"{index}. {phase}")
-
-print(f"\n🧠 Skills to Learn")
-for skill in roadmap_result.skills_to_learn:
-    print(f"• {skill}")
-
-print(f"\n🛠️ Projects to Build")
-for project in roadmap_result.projects_to_build:
-    print(f"• {project}")
-
-print(f"\n💡 Final Advice")
-print(roadmap_result.final_advice)
-
-print("\n" + "=" * 65)
-
-print("\n" + "=" * 65)
-print("PROJECT RECOMMENDATIONS")
-print("=" * 65)
-
-for index, project in enumerate(project_result.projects, start=1):
-
-    print(f"\n🚀 Project {index}: {project.title}")
-
-    print(f"Difficulty: {project.difficulty}")
-
-    print("\nPurpose:")
-    print(project.purpose)
-
-    print("\nTech Stack:")
-    for tech in project.tech_stack:
-        print(f"• {tech}")
-
-    print("\nKey Features:")
-    for feature in project.key_features:
-        print(f"• {feature}")
-
-    print("\n" + "-" * 65)
+    # 4. Interview Preparation
+    interview_result = run_interview_preparation(
+        career_result,
+        roadmap_result,
+        project_result,
+    )
+    display_interview_preparation(interview_result)
 
     print("\n" + "=" * 65)
-print("INTERVIEW PREPARATION")
-print("=" * 65)
+    print("🤖 CAREER MENTOR COMPLETE")
+    print("=" * 65)
 
-print("\n📚 Important Topics")
-for topic in interview_result.important_topics:
-    print(f"• {topic}")
 
-print("\n💻 Technical Questions")
-for index, question in enumerate(
-    interview_result.technical_questions,
-    start=1
-):
-    print(f"{index}. {question}")
-
-print("\n🤝 Behavioral Questions")
-for index, question in enumerate(
-    interview_result.behavioral_questions,
-    start=1
-):
-    print(f"{index}. {question}")
-
-print("\n🛠️ Practical Questions")
-for index, question in enumerate(
-    interview_result.practical_questions,
-    start=1
-):
-    print(f"{index}. {question}")
-
-print("\n🎯 Preparation Strategy")
-for index, strategy in enumerate(
-    interview_result.preparation_strategy,
-    start=1
-):
-    print(f"{index}. {strategy}")
-
-print("\n" + "-" * 65)
+if __name__ == "__main__":
+    main()
