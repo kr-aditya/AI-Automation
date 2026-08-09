@@ -1,5 +1,6 @@
 from chains.career_chain import career_chain
 from chains.roadmap_chain import roadmap_chain
+from chains.project_chain import project_chain
 
 print("=" * 65)
 print("🤖 AI Career Mentor")
@@ -26,6 +27,13 @@ roadmap_input = {
 }
 
 roadmap_result = roadmap_chain.invoke(roadmap_input)
+
+project_input = {
+    "career_analysis": result.model_dump_json(indent=2),
+    "roadmap": roadmap_result.model_dump_json(indent=2)
+}
+
+project_result = project_chain.invoke(project_input)
 
 print("=" * 65)
 print("CAREER ANALYSIS")
@@ -83,3 +91,25 @@ print(roadmap_result.final_advice)
 
 print("\n" + "=" * 65)
 
+print("\n" + "=" * 65)
+print("PROJECT RECOMMENDATIONS")
+print("=" * 65)
+
+for index, project in enumerate(project_result.projects, start=1):
+
+    print(f"\n🚀 Project {index}: {project.title}")
+
+    print(f"Difficulty: {project.difficulty}")
+
+    print("\nPurpose:")
+    print(project.purpose)
+
+    print("\nTech Stack:")
+    for tech in project.tech_stack:
+        print(f"• {tech}")
+
+    print("\nKey Features:")
+    for feature in project.key_features:
+        print(f"• {feature}")
+
+    print("\n" + "-" * 65)
