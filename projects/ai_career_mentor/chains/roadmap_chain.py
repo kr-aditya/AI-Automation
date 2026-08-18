@@ -3,17 +3,15 @@ from langchain_groq import ChatGroq
 
 from prompts.roadmap_prompt import roadmap_prompt
 from schemas.roadmap_schema import RoadmapSchema
-
+from utils.llm import llm
 
 load_dotenv()
 
 
-model = ChatGroq(
-    model="llama-3.3-70b-versatile"
-)
 
 
-structured_model = model.with_structured_output(
+
+structured_model = llm.with_structured_output(
     RoadmapSchema
 )
 

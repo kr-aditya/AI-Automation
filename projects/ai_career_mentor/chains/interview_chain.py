@@ -3,17 +3,15 @@ from langchain_groq import ChatGroq
 
 from prompts.interview_prompt import interview_prompt
 from schemas.interview_schema import InterviewSchema
-
+from utils.llm import llm
 
 load_dotenv()
 
 
-model = ChatGroq(
-    model="llama-3.3-70b-versatile"
-)
 
 
-structured_model = model.with_structured_output(
+
+structured_model = llm.with_structured_output(
     InterviewSchema
 )
 
