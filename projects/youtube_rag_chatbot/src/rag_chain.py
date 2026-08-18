@@ -3,7 +3,7 @@ from operator import itemgetter
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 
-from sources import format_sources
+from .sources import format_sources
 
 
 def format_docs(documents):

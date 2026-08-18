@@ -1,12 +1,12 @@
-from transcript import get_transcript
-from documents import create_document
-from splitter import split_document
-from embeddings import create_embedding_model
-from vector_store import create_vector_store
-from retrieval import create_retriever
-from prompts import create_rag_prompt
-from llm import create_llm
-from rag_chain import create_rag_chain
+from .transcript import get_transcript
+from .documents import create_document
+from .splitter import split_document
+from .embeddings import create_embedding_model
+from .vector_store import create_vector_store
+from .retrieval import create_retriever
+from .prompts import create_rag_prompt
+from .llm import create_llm
+from .rag_chain import create_rag_chain
 
 
 def build_video_pipeline(video_id: str):

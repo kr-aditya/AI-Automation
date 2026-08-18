@@ -1,5 +1,12 @@
 import streamlit as st
 
+from src.youtube import extract_video_id
+from src.pipeline import build_video_pipeline
+
+
+# --------------------------------------------------
+# PAGE CONFIG
+# --------------------------------------------------
 
 st.set_page_config(
     page_title="YouTube RAG Chatbot",
@@ -7,6 +14,21 @@ st.set_page_config(
     layout="centered",
 )
 
+
+# --------------------------------------------------
+# SESSION STATE
+# --------------------------------------------------
+
+if "rag_chain" not in st.session_state:
+    st.session_state.rag_chain = None
+
+if "video_id" not in st.session_state:
+    st.session_state.video_id = None
+
+
+# --------------------------------------------------
+# HEADER
+# --------------------------------------------------
 
 st.title("🎥 YouTube RAG Chatbot")
 
@@ -32,9 +54,34 @@ if st.button("Process Video"):
         st.warning("Please enter a YouTube URL.")
 
     else:
-        st.info(
-            "Video processing will be connected here."
-        )
+        try:
+            video_id = extract_video_id(youtube_url)
+
+            with st.spinner(
+                "Processing video... This may take a moment."
+            ):
+                rag_chain = build_video_pipeline(video_id)
+
+            st.session_state.rag_chain = rag_chain
+            st.session_state.video_id = video_id
+
+            st.success("✅ Video processed successfully!")
+
+        except Exception as error:
+            st.error(
+                f"Unable to process this video: {error}"
+            )
+
+
+# --------------------------------------------------
+# SHOW PROCESSING STATUS
+# --------------------------------------------------
+
+if st.session_state.rag_chain is not None:
+
+    st.info(
+        f"Video ready: {st.session_state.video_id}"
+    )
 
 
 # --------------------------------------------------
@@ -43,16 +90,60 @@ if st.button("Process Video"):
 
 question = st.text_input(
     "Ask a question",
-    placeholder="What is this video about?",
+    placeholder="What does this video explain?",
 )
 
 
 if st.button("Ask"):
 
-    if not question:
-        st.warning("Please enter a question.")
+    if st.session_state.rag_chain is None:
+        st.warning(
+            "Please process a YouTube video first."
+        )
+
+    elif not question:
+        st.warning(
+            "Please enter a question."
+        )
 
     else:
-        st.info(
-            "RAG question answering will be connected here."
-        )
+
+        with st.spinner("Finding the answer..."):
+
+            result = st.session_state.rag_chain.invoke(
+                {
+                    "question": question
+                }
+            )
+
+        # ------------------------------
+        # ANSWER
+        # ------------------------------
+
+        st.subheader("Answer")
+
+        st.write(result["answer"])
+
+        # ------------------------------
+        # SOURCES
+        # ------------------------------
+
+        st.subheader("Sources")
+
+        for source in result["sources"]:
+
+            with st.expander(
+                f"Source {source['index']}"
+            ):
+
+                st.write(
+                    f"**Type:** {source['source']}"
+                )
+
+                st.write(
+                    f"**Video ID:** {source['video_id']}"
+                )
+
+                st.write(
+                    source["content"]
+                )
