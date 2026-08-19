@@ -5,3 +5,11 @@ __pycache__/
 outputs/
 data/resumes/
 data/chroma_resume/
+# Local development / test scripts
+app.py
+test_career_from_resume.py
+test_resume_rag.py
+run_resume_analysis.py
+
+# Local Streamlit files
+.streamlit/
